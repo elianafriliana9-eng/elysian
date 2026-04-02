@@ -1,65 +1,105 @@
-import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import MarqueeStrip from "@/components/MarqueeStrip";
+import Services from "@/components/Services";
+import Process from "@/components/Process";
+import Portfolio from "@/components/Portfolio";
+import Pricing from "@/components/Pricing";
+import Testimonials from "@/components/Testimonials";
+import Contact from "@/components/Contact";
+import Footer from "@/components/Footer";
 
-export default function Home() {
+async function fetchLandingData() {
+  try {
+    const sb = await createClient();
+
+    const [
+      { data: heroStats },
+      { data: marqueeItems },
+      { data: processSteps },
+      { data: services },
+      { data: servicePoints },
+      { data: portfolioProjects },
+      { data: portfolioTech },
+      { data: pricingPlans },
+      { data: pricingFeatures },
+      { data: testimonials },
+      { data: siteSettings },
+    ] = await Promise.all([
+      sb.from("hero_stats").select("*").order("sort_order"),
+      sb.from("marquee_items").select("*").eq("is_active", true).order("sort_order"),
+      sb.from("process_steps").select("*").order("sort_order"),
+      sb.from("services").select("*").eq("is_active", true).order("sort_order"),
+      sb.from("service_points").select("*").order("sort_order"),
+      sb.from("portfolio_projects").select("*").eq("is_visible", true).order("sort_order"),
+      sb.from("portfolio_tech").select("*").order("sort_order"),
+      sb.from("pricing_plans").select("*").order("sort_order"),
+      sb.from("pricing_features").select("*").order("sort_order"),
+      sb.from("testimonials").select("*").eq("is_visible", true).order("sort_order"),
+      sb.from("site_settings").select("*"),
+    ]);
+
+    // Merge service points into services
+    const mergedServices = (services ?? []).map((s) => ({
+      ...s,
+      points: (servicePoints ?? [])
+        .filter((p) => p.service_id === s.id)
+        .map((p) => p.text as string),
+    }));
+
+    // Merge tech into portfolio projects
+    const mergedPortfolio = (portfolioProjects ?? []).map((p) => ({
+      ...p,
+      tech: (portfolioTech ?? [])
+        .filter((t) => t.project_id === p.id)
+        .map((t) => t.tech as string),
+    }));
+
+    // Merge features into pricing plans
+    const mergedPlans = (pricingPlans ?? []).map((p) => ({
+      ...p,
+      features: (pricingFeatures ?? [])
+        .filter((f) => f.plan_id === p.id)
+        .map((f) => f.text as string),
+    }));
+
+    // Convert site_settings array to Record
+    const settings: Record<string, string> = {};
+    (siteSettings ?? []).forEach((s) => { settings[s.key] = s.value; });
+
+    return {
+      heroStats:  (heroStats ?? []).map((s) => ({ value: s.value as string, label: s.label as string })),
+      marqueeItems: (marqueeItems ?? []).map((i) => i.text as string),
+      processSteps: (processSteps ?? []).map((s) => ({ title: s.title as string, description: s.description as string })),
+      services:   mergedServices,
+      portfolio:  mergedPortfolio,
+      plans:      mergedPlans,
+      testimonials: testimonials ?? [],
+      settings,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export default async function Home() {
+  const data = await fetchLandingData();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <Navbar />
+      <main>
+        <Hero        stats={data?.heroStats} />
+        <MarqueeStrip items={data?.marqueeItems} />
+        <Services    services={data?.services} />
+        <Process     steps={data?.processSteps} />
+        <Portfolio   projects={data?.portfolio} />
+        <Pricing     plans={data?.plans} />
+        <Testimonials testimonials={data?.testimonials} />
+        <Contact     settings={data?.settings} />
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }
