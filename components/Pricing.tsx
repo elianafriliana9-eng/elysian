@@ -99,7 +99,7 @@ const DEFAULT_PLANS = [
   {
     name: "Enterprise",
     subtitle: "Custom System",
-    price: "Rp 25jt+",
+    price: "Contact Us",
     cta: "Let's Discuss",
     popular: false,
     mobile: false,
@@ -124,18 +124,18 @@ export default function Pricing({ plans: plansProp }: { plans?: PlanData[] }) {
   const plans =
     plansProp && plansProp.length > 0
       ? plansProp.map((p) => ({
-          name: p.name,
-          subtitle: p.subtitle,
-          price: p.price,
-          cta: p.cta,
-          popular: p.is_popular,
-          mobile: p.is_mobile,
-          badge: p.badge ?? undefined,
-          addon: p.addon ?? null,
-          includes: p.includes ?? null,
-          stacks: p.has_stacks ? stackGroups : null,
-          features: p.features,
-        }))
+        name: p.name,
+        subtitle: p.subtitle,
+        price: p.price,
+        cta: p.cta,
+        popular: p.is_popular,
+        mobile: p.is_mobile,
+        badge: p.badge ?? undefined,
+        addon: p.addon ?? null,
+        includes: p.includes ?? null,
+        stacks: p.has_stacks ? stackGroups : null,
+        features: p.features,
+      }))
       : DEFAULT_PLANS;
 
   return (
@@ -214,21 +214,21 @@ export default function Pricing({ plans: plansProp }: { plans?: PlanData[] }) {
                 background: plan.popular
                   ? "var(--bg)"
                   : plan.mobile
-                  ? "rgba(100,255,218,0.03)"
-                  : "var(--surface-2)",
+                    ? "rgba(100,255,218,0.03)"
+                    : "var(--surface-2)",
                 borderRadius: "20px",
                 border: plan.popular
                   ? "1px solid rgba(200,169,110,0.5)"
                   : plan.mobile
-                  ? "1px solid rgba(100,255,218,0.2)"
-                  : "1px solid var(--border)",
+                    ? "1px solid rgba(100,255,218,0.2)"
+                    : "1px solid var(--border)",
                 padding: plan.popular ? "44px 28px" : "32px 28px",
                 transform: plan.popular ? "scale(1.04)" : "scale(1)",
                 boxShadow: plan.popular
                   ? "0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,169,110,0.15)"
                   : plan.mobile
-                  ? "0 8px 32px rgba(100,255,218,0.05)"
-                  : "none",
+                    ? "0 8px 32px rgba(100,255,218,0.05)"
+                    : "none",
                 zIndex: plan.popular ? 1 : 0,
               }}
             >
