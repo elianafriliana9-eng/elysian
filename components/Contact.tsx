@@ -43,10 +43,10 @@ type ContactSettings = {
 };
 
 export default function Contact({ settings }: { settings?: ContactSettings }) {
-  const email        = settings?.email         ?? "hello@elysianproject.id";
-  const whatsapp     = settings?.whatsapp      ?? "6281234567890";
+  const email = settings?.email ?? "[EMAIL_ADDRESS]";
+  const whatsapp = settings?.whatsapp ?? "6285175090448";
   const instagramUrl = settings?.instagram_url ?? "https://instagram.com/elysianproject";
-  const linkedinUrl  = settings?.linkedin_url  ?? "https://linkedin.com/company/elysianproject";
+  const linkedinUrl = settings?.linkedin_url ?? "https://linkedin.com/company/elysianproject";
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
@@ -232,7 +232,7 @@ export default function Contact({ settings }: { settings?: ContactSettings }) {
           <div style={{ display: "flex", gap: "12px" }}>
             {[
               { href: instagramUrl, Icon: Instagram, label: "Instagram" },
-              { href: linkedinUrl,  Icon: Linkedin,  label: "LinkedIn"  },
+              { href: linkedinUrl, Icon: Linkedin, label: "LinkedIn" },
             ].map(({ href, Icon, label }) => (
               <a
                 key={label}
